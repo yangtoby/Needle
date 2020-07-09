@@ -1,0 +1,161 @@
+﻿<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+<link href="~/Content/ElementUI/element-ui.css" rel="stylesheet" />
+<script src="~/Scripts/vue.min.js"></script>
+<script src="~/Scripts/axios.js"></script>
+<script src="~/Scripts/ElementUI/element-ui.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
+<script src="~/Scripts/ECharts/echarts.js"></script>
+<div id="app">
+    <h2>步长频率统计</h2>
+    <el-tabs v-model="activeName2" type="border-card" @@tab-click="handleClick">
+        <el-tab-pane label="2分法" name="avgTwo">
+            <el-table :data="twoTableData"
+                      strip="true"
+                      style="width: 350px;display:inline-block">
+                <el-table-column property="AverageStep"
+                                 label="步长"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="AvgStepCount"
+                                 label="步长次数"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="PercentStr" label="步长百分比" width="100">
+
+                </el-table-column>
+               
+            </el-table>
+            <div id="twoChart" style="width: 500px;height:400px; float:right;"></div>
+        </el-tab-pane>
+        <el-tab-pane label="4分法" name="avgFour">
+            <el-table :data="fourTableData"
+                      strip="true"
+                      style="width: 350px;display:inline-block">
+                <el-table-column property="AverageStep"
+                                 label="步长"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="AvgStepCount"
+                                 label="步长次数"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="PercentStr" label="步长百分比" width="100">
+                </el-table-column>
+            </el-table>
+            <div id="fourChart" style="width: 500px;height:400px; float:right;"></div>
+        </el-tab-pane>
+        <el-tab-pane label="8分法" name="avgEight">
+            <el-table :data="eightTableData"
+                      strip="true"
+                      style="width: 350px;display:inline-block">
+                <el-table-column property="AverageStep"
+                                 label="步长"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="AvgStepCount"
+                                 label="步长次数"
+                                 width="100">
+                </el-table-column>
+                <el-table-column property="PercentStr" label="步长百分比" width="100">
+
+                </el-table-column>
+
+            </el-table>
+            <div id="eightChart" style="width: 500px;height:400px; float:right;"></div>
+        </el-tab-pane>
+
+    </el-tabs>
+</div>
+<style>
+    
+</style>
+<script>
+    var vueApp = new Vue({
+        el: '#app',
+        data: {
+            activeName2: 'avgTwo',
+            twoTableData: [],
+            fourTableData: [],
+            eightTableData: []
+        },
+        created: function () {
+           this.handleClick();
+        },
+        methods: {
+            handleClick(tab, event) {
+                var _this = this;
+                var tabName = _this.activeName2;
+                axios.get("/Average3D/GetStepList", {
+                    params: {
+                        stepName: tabName
+                    }
+                }).then(response => {
+                    if (response.status == 200) {
+                        var tempTableData = [];
+                        var chartData = [];
+                        for (var i = 0; i < response.data.length; i++) {
+                            var item = {};
+                            item.AverageStep = response.data[i].AverageStep;
+                            item.AvgStepCount = response.data[i].AvgStepCount;
+                            item.PercentStr = response.data[i].PercentStr;
+                            tempTableData.push(item);
+                            var chartItem = {};
+                            chartItem.name = response.data[i].AverageStep;
+                            chartItem.value = response.data[i].AvgStepCount;
+                            chartData.push(chartItem);
+                        }
+                       
+                      
+                        switch (tabName) {
+                            case "avgTwo":
+                                _this.twoTableData = tempTableData;
+                                var twoChart = echarts.init(document.getElementById('twoChart'));
+                                twoChart.setOption({
+                                    series: [
+                                        {
+                                            name: '步长分布',
+                                            type: 'pie',
+                                            radius: '55%',
+                                            data: chartData
+                                        }
+                                    ]
+                                })
+                                break;
+                            case "avgFour":
+                                _this.fourTableData = tempTableData;
+                                var fourChart = echarts.init(document.getElementById('fourChart'));
+                                fourChart.setOption({
+                                    series: [
+                                        {
+                                            name: '步长分布',
+                                            type: 'pie',
+                                            radius: '55%',
+                                            data: chartData
+                                        }
+                                    ]
+                                })
+                                break;
+                            case "avgEight":
+                                _this.eightTableData = tempTableData;
+                                var eightChart = echarts.init(document.getElementById('eightChart'));
+                                eightChart.setOption({
+                                    series: [
+                                        {
+                                            name: '步长分布',
+                                            type: 'pie',
+                                            radius: '55%',
+                                            data: chartData
+                                        }
+                                    ]
+                                })
+                                break;
+
+                        }
+                    }
+                })
+             
+            }
+        }
+    });
+</script>
+

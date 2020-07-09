@@ -1,0 +1,110 @@
+﻿<link href="~/Content/ElementUI/element-ui.css" rel="stylesheet" />
+<script src="~/Scripts/vue.min.js"></script>
+<script src="~/Scripts/axios.js"></script>
+<script src="~/Scripts/ElementUI/element-ui.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
+
+@{
+    ViewBag.Title = "Index";
+}
+<div id="app">
+    <h2>3D列表</h2>
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+ 
+    <el-table :data="tableData" style="width:100%" :row-class-name="tableRowClassName">
+        <el-table-column property="Number" label="期号" width="180"></el-table-column>
+        <el-table-column property="FirstChar" label="百位" width="180"></el-table-column>
+        <el-table-column property="SecondChar" label="十位" width="180"></el-table-column>
+        <el-table-column property="ThirdChar" label="个位" width="180"></el-table-column>
+        <el-table-column property="AllChar" label="奖号" width="180"></el-table-column>
+        <el-table-column property="DrawDate" label="开奖日期" width="180" :formatter="formatDate"></el-table-column>
+    </el-table>
+    <div class="Pagination" style="text-align: left; margin-top: 10px;">
+        <el-pagination background
+                       @@size-change="handleSizeChange"
+                       @@current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-size="limit"
+                       layout="total, prev, pager, next"
+                       :total="total">
+        </el-pagination>
+    </div>
+</div>
+<style>
+    .el-table .warning-row {
+        background: oldlace;
+    }
+
+    .el-table .success-row {
+        background: #f0f9eb;
+    }
+</style>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            limit: 10,
+            total: 0,
+            currentPage: 1,
+            tableData:[],
+        },
+        created:function(){
+            this.getTableData();
+        },
+        methods: {
+            tableRowClassName({ row, rowIndex }) {
+                if (rowIndex === 1) {
+                    return 'warning-row';
+                } else if (rowIndex === 3) {
+                    return 'success-row';
+                }
+                return '';
+            },
+            getTableData() {
+                var _this = this;
+                axios.get('/Lottery3D/GetTableData', {
+                    params: {
+                        pageIndex: _this.currentPage,
+                        pageSize: _this.limit
+                    }
+                }).then(function (response) {
+                        _this.tableData = [];
+                       
+                        if (response.status == 200) {
+                            _this.total=response.data.Total
+                            for (var i = 0; i < response.data.PageList.length; i++) {
+                                var item = {};
+                                item.AllChar = response.data.PageList[i].AllChar,
+                                    item.Number = response.data.PageList[i].Number,
+                                    item.FirstChar = response.data.PageList[i].FirstChar,
+                                    item.SecondChar = response.data.PageList[i].SecondChar,
+                                    item.ThirdChar = response.data.PageList[i].ThirdChar,
+                                    item.DrawDate = response.data.PageList[i].DrawDate
+                                
+                                _this.tableData.push(item);
+                            }
+                           
+                        }
+                       
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getTableData();
+            },
+            formatDate(row, column) {
+                let data = row[column.property]
+                return moment(data).format('YYYY-MM-DD');
+            }
+        }
+    })
+</script>
+

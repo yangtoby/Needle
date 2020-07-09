@@ -1,0 +1,77 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/ElementUI/element-ui.css" rel="stylesheet" />
+    <script src="~/Scripts/vue.min.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <script src="~/Scripts/ElementUI/element-ui.js"></script>
+    <script src="~/Scripts/moment.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-form :model="ruleForm2" status-icon  ref="ruleForm2" label-width="100px" class="demo-ruleForm" style="text-align: center;
+    width: 400px;
+    margin: auto;
+    margin-top: 100px;">
+            <el-form-item label="账号" property="accountName">
+                <el-input type="text" v-model="ruleForm2.accountName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="pass">
+                <el-input type="password" v-model="ruleForm2.pwd" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @@click="submitForm('ruleForm2')">提交</el-button>
+                <el-button @@click="resetForm('ruleForm2')">重置</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                ruleForm2: {
+                    accountName: '',
+                    pwd: ''
+                },
+               
+            },
+            created: function () {
+               // this.getTableData();
+            },
+            methods: {
+                submitForm(formName) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            axios.post('/Account/Login', {
+                                input: {
+                                    AccountName: this.ruleForm2.accountName,
+                                    Pwd: this.ruleForm2.pwd
+                                }
+                            }).then(response => {
+                                if (response.status == 200) {
+                                    location.href = "/Average3D/index";
+                                }
+                            }).catch(error => console.log(error))
+                        } else {
+                            console.log('error submit!!');
+                            return false;
+                        }
+                    });
+                },
+                resetForm(formName) {
+                    this.$refs[formName].resetFields();
+                }
+            }
+        })
+    </script>
+
+</body>
+</html>

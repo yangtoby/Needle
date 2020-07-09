@@ -1,0 +1,153 @@
+﻿<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+
+
+<script src="~/Scripts/vue.min.js"></script>
+<script src="~/Scripts/axios.js"></script>
+<script src="~/Scripts/ElementUI/element-ui.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
+@*<script src="~/Scripts/ECharts/echarts-all.js"></script>*@
+@*<script src="~/Scripts/ECharts/echarts.js"></script>*@
+<link href="~/Content/ElementUI/element-ui.css" rel="stylesheet" />
+<script src="~/Scripts/ECharts/echarts.js"></script>
+<div id="app">
+    <h2>统计图</h2>
+    <div id="app">
+        <div id="mainTwo" style="width: 600px;height:400px;"></div>
+        <div id="mainFour" style="width: 600px;height:400px;"></div>
+        <div id="mainEight" style="width: 600px;height:400px;"></div>
+    </div>
+</div>
+<script>
+    //// Vue.prototype.$echarts = echarts;
+    var app = new Vue({
+        el: '#app',
+        data: {
+
+        },
+        mounted: function () {
+            this.drawLine();
+        },
+        methods: {
+            drawLine() {
+                // 基于准备好的dom，初始化echarts实例
+                var mainTwo = echarts.init(document.getElementById('mainTwo'));
+                var mainFour = echarts.init(document.getElementById('mainFour'));
+                var mainEight = echarts.init(document.getElementById('mainEight'));
+
+                // 指定图表的配置项和数据
+               
+                var _this = this;
+              //  myChart.setOption(option);
+                axios.get('/Average3D/GetEchartsBar').then(function (response) {
+                    var xDataTwo = ["1", "2"];
+                    var yDataTwo = [];
+                    if (response.status == 200) {
+                        for (var i = 0; i < xDataTwo.length; i++) {
+                            var item = response.data.TwoEchartsBar.find(function (x) {
+                                return x.XName == xDataTwo[i]
+                            })
+                            if (item != undefined) {
+                                yDataTwo.push(item.YCount);
+                            } else {
+                                yDataTwo.push(0);
+                            }
+                        }
+                    }
+                    var optionTwo = {
+                        title: {
+                            text: '2分法'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: ['2分法']
+                        },
+                        xAxis: {
+                            data: xDataTwo
+                        },
+                        yAxis: {},
+                        series: [{
+                            barWidth: 50,
+                            name: '2分法',
+                            type: 'bar',
+                            data: yDataTwo
+                        }]
+                    };
+                    mainTwo.setOption(optionTwo);
+
+                    var xDataFour = ["1", "2","3","4"];
+                    var yDataFour = [];
+                    if (response.status == 200) {
+                        for (var i = 0; i < xDataFour.length; i++) {
+                            var item = response.data.FourEchartsBar.find(function (x) {
+                                return x.XName == xDataFour[i]
+                            })
+                            if (item != undefined) {
+                                yDataFour.push(item.YCount);
+                            } else {
+                                yDataFour.push(0);
+                            }
+                        }
+                    }
+                    var optionFour = {
+                        title: {
+                            text: '4分法'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: ['4分法']
+                        },
+                        xAxis: {
+                            data: xDataFour
+                        },
+                        yAxis: {},
+                        series: [{
+                            barWidth: 50,
+                            name: '4分法',
+                            type: 'bar',
+                            data: yDataFour
+                        }]
+                    };
+                    mainFour.setOption(optionFour);
+
+                    var xDataEight = ["1", "2","3","4","5","6","7","8"];
+                    var yDataEight = [];
+                    if (response.status == 200) {
+                        for (var i = 0; i < xDataEight.length; i++) {
+                            var item = response.data.EightEchartsBar.find(function (x) {
+                                return x.XName == xDataEight[i]
+                            })
+                            if (item != undefined) {
+                                yDataEight.push(item.YCount);
+                            } else {
+                                yDataEight.push(0);
+                            }
+                        }
+                    }
+                    var optionEight = {
+                        title: {
+                            text: '8分法'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: ['8分法']
+                        },
+                        xAxis: {
+                            data: xDataEight
+                        },
+                        yAxis: {},
+                        series: [{
+                            barWidth: 30,
+                            name: '8分法',
+                            type: 'bar',
+                            data: yDataEight
+                        }]
+                    };
+                    mainEight.setOption(optionEight);
+                })
+
+
+            }
+        }
+    });
+
+</script>
